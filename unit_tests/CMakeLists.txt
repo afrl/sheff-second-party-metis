@@ -22,13 +22,13 @@ foreach(_test ${_unit_tests})
   STRING(REPLACE ".cpp" "" _name ${_category}_${_name})   # test name prefixed with category
   add_executable(${_name} ${_test})
   set_property(TARGET ${_name} PROPERTY FOLDER unit_tests)
-  target_link_libraries(${_name} PRIVATE SecondPartyMesh::SecondPartyMesh)
+  target_link_libraries(${_name} PRIVATE SecondPartyMetis::SecondPartyMetis)
   
   include(${CMAKE_SOURCE_DIR}/cmake/Utilities.cmake)
-  assign_source_group("second_party_mesh" ${SECONDPARTYMESH_HEADER_LIST})
+  assign_source_group("second_party_metis" ${SECONDPARTYMETIS_HEADER_LIST})
 
   # Create test
-  add_test(NAME "Unit_SecondPartyMesh_${_name}"   # test name prefixed with Unit and project
+  add_test(NAME "Unit_SecondPartyMetis_${_name}"   # test name prefixed with Unit and project
     COMMAND ${_name}                              # test executable
     WORKING_DIRECTORY ${TEST_WORKDIR}             # directory to call program from and write output to
     )

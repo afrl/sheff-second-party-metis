@@ -9,12 +9,12 @@ project(SECONDPARTYMETIS VERSION 1.0.0 LANGUAGES C)
 # $HOME/.cmake/packages, to a similar location with the folder name given by the 
 # compiler family. 
 if (UNIX)
-    execute_process(COMMAND "mkdir" "-p" "$ENV{HOME}/.cmake/${CMAKE_CXX_COMPILER_ID}"
+    execute_process(COMMAND "mkdir" "-p" "$ENV{HOME}/.cmake/${CMAKE_C_COMPILER_ID}"
       RESULT_VARIABLE toolchain_res OUTPUT_VARIABLE toolchain_out)
     if (toolchain_res)
-        message(ERROR "Couldn't create toolchain dir: $ENV{HOME}/.cmake/${CMAKE_CXX_COMPILER_ID} ${toolchain_out}")
+        message(ERROR "Couldn't create toolchain dir: $ENV{HOME}/.cmake/${CMAKE_C_COMPILER_ID} ${toolchain_out}")
     endif ()
-    execute_process(COMMAND "ln" "-sfn" "$ENV{HOME}/.cmake/${CMAKE_CXX_COMPILER_ID}" "$ENV{HOME}/.cmake/packages"
+    execute_process(COMMAND "ln" "-sfn" "$ENV{HOME}/.cmake/${CMAKE_C_COMPILER_ID}" "$ENV{HOME}/.cmake/packages"
       RESULT_VARIABLE toolchain_res OUTPUT_VARIABLE toolchain_out)
     if (toolchain_res)
         message(ERROR "Couldn't create toolchain link: $ENV{HOME}/.cmake/packages ${toolchain_out}")
@@ -26,7 +26,7 @@ endif()
 option(SECONDPARTYMETIS_BuildTests "Build the unit tests." OFF)
 
 # For debugging, print generator, compiler, and options
-message(STATUS "Gen: ${CMAKE_GENERATOR}, CXX: ${CMAKE_CXX_COMPILER_ID}, Mode: ${CMAKE_BUILD_TYPE}")
+message(STATUS "Gen: ${CMAKE_GENERATOR}, C: ${CMAKE_C_COMPILER_ID}, Mode: ${CMAKE_BUILD_TYPE}")
 message(STATUS "Tests: ${SECONDPARTYMETIS_BuildTests}")
 
 # Add cmake dir to module path
@@ -41,6 +41,11 @@ include(${CMAKE_SOURCE_DIR}/cmake/CommonInputChecks.cmake)
 ################################
 # Setting up SECONDPARTYMETIS target #
 ################################
+
+# Required for some non-standard functions in GNU
+if (${CMAKE_C_COMPILER_ID} STREQUAL "GNU" )
+    add_definitions(-D_XOPEN_SOURCE=700)
+endif()
 
 # Set the variables for SECONDPARTYMETIS
 set(SECONDPARTYMETIS_INCLUDE ${CMAKE_SOURCE_DIR}/include)

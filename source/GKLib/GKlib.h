@@ -37,7 +37,7 @@
 #include <float.h>
 #include <time.h>
 #include <string.h>
-#if not defined(_MSC_VER)
+#if !defined(_MSC_VER)
 #include <unistd.h>
 #endif
 #include <limits.h>
