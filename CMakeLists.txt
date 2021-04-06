@@ -3,25 +3,6 @@ cmake_minimum_required(VERSION 3.8)
 cmake_policy(SET CMP0048 NEW)
 project(SECONDPARTYMETIS VERSION 1.0.0 LANGUAGES C)
 
-# Set package toolchain location for Linux. To enable efficient switching between
-# toolchains for cross-compiling, we modify the location where CMake looks for 
-# packages using the find_package command by symbolically linking the default location,
-# $HOME/.cmake/packages, to a similar location with the folder name given by the 
-# compiler family. 
-if (UNIX)
-    execute_process(COMMAND "mkdir" "-p" "$ENV{HOME}/.cmake/${CMAKE_C_COMPILER_ID}"
-      RESULT_VARIABLE toolchain_res OUTPUT_VARIABLE toolchain_out)
-    if (toolchain_res)
-        message(ERROR "Couldn't create toolchain dir: $ENV{HOME}/.cmake/${CMAKE_C_COMPILER_ID} ${toolchain_out}")
-    endif ()
-    execute_process(COMMAND "ln" "-sfn" "$ENV{HOME}/.cmake/${CMAKE_C_COMPILER_ID}" "$ENV{HOME}/.cmake/packages"
-      RESULT_VARIABLE toolchain_res OUTPUT_VARIABLE toolchain_out)
-    if (toolchain_res)
-        message(ERROR "Couldn't create toolchain link: $ENV{HOME}/.cmake/packages ${toolchain_out}")
-    endif ()
-endif()
-
-
 # Options
 option(SECONDPARTYMETIS_BuildTests "Build the unit tests." OFF)
 
@@ -30,13 +11,13 @@ message(STATUS "Gen: ${CMAKE_GENERATOR}, C: ${CMAKE_C_COMPILER_ID}, Mode: ${CMAK
 message(STATUS "Tests: ${SECONDPARTYMETIS_BuildTests}")
 
 # Add cmake dir to module path
-list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
+list(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake")
 
 ##################
 # Checking input #
 ##################
 
-include(${CMAKE_SOURCE_DIR}/cmake/CommonInputChecks.cmake)
+include(${PROJECT_SOURCE_DIR}/cmake/CommonInputChecks.cmake)
 
 ################################
 # Setting up SECONDPARTYMETIS target #
@@ -48,8 +29,8 @@ if (${CMAKE_C_COMPILER_ID} STREQUAL "GNU" )
 endif()
 
 # Set the variables for SECONDPARTYMETIS
-set(SECONDPARTYMETIS_INCLUDE ${CMAKE_SOURCE_DIR}/include)
-set(SECONDPARTYMETIS_SRC ${CMAKE_SOURCE_DIR}/source)
+set(SECONDPARTYMETIS_INCLUDE ${PROJECT_SOURCE_DIR}/include)
+set(SECONDPARTYMETIS_SRC ${PROJECT_SOURCE_DIR}/source)
 file (GLOB_RECURSE SECONDPARTYMETIS_HEADER_LIST "${SECONDPARTYMETIS_INCLUDE}/*.h")
 file (GLOB_RECURSE SECONDPARTYMETIS_SOURCE_LIST "${SECONDPARTYMETIS_SRC}/*.h" "${SECONDPARTYMETIS_SRC}/*.c")
     
@@ -73,12 +54,17 @@ target_sources(secondpartymetis PUBLIC ${SECONDPARTYMETIS_HEADER_LIST})
 target_sources(secondpartymetis PRIVATE ${SECONDPARTYMETIS_SOURCE_LIST})
 # Add an alias so that a library can be used inside the build tree, eg when testing
 add_library(SecondPartyMetis::SecondPartyMetis ALIAS secondpartymetis)
+set_target_properties(secondpartymetis PROPERTIES FOLDER "sheff")
 
-# Assign source groups
-include(${CMAKE_SOURCE_DIR}/cmake/Utilities.cmake)
-assign_source_group("second_party_metis" ${SECONDPARTYMETIS_HEADER_LIST})
-assign_source_group("second_party_metis" ${SECONDPARTYMETIS_SOURCE_LIST})
+###########################
+# Assigning source groups #
+###########################
 
+include("$ENV{SHEFF_TOOLS}/cmake/IncludeSHEFF.cmake")
+register_sources_sheff("second_party_metis"
+                       "${SECONDPARTYMETIS_HEADER_LIST}"
+                       "${SECONDPARTYMETIS_SOURCE_LIST}")
+assign_source_groups_sheff()
 
 #################################
 # Add unit test targets #
@@ -144,6 +130,3 @@ export(
     FILE ${CMAKE_CURRENT_BINARY_DIR}/SecondPartyMetisTargets.cmake
     NAMESPACE SecondPartyMetis::
 )
-
-# Register package in user's package registry
-export(PACKAGE SecondPartyMetis)
