@@ -34,6 +34,11 @@ set(SHEFF_EXTERNAL_DEPENDS_targets "")
 set(SHEFF_EXTERNAL_DEPENDS_compile_defs "")
 
 macro(SPECIAL_TARGET_COMMANDS)
+  # Required for some non-standard functions in GNU
+  if (${CMAKE_C_COMPILER_ID} STREQUAL "GNU" )
+    add_definitions(-D_XOPEN_SOURCE=700)
+  endif()
+
   set_target_properties(second_party_metis PROPERTIES LINKER_LANGUAGE C)
   # Special definitions for metis needed for Windows
   if (WIN32)
