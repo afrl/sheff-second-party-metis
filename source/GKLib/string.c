@@ -15,7 +15,7 @@ of standard functions (but with enhanced functionality).
 
 #include "GKlib.h"
 
-
+#include <time.h>
 
 /************************************************************************/
 /*! \brief Replaces certain characters in a string.

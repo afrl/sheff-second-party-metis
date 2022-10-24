@@ -34,8 +34,8 @@ set(SHEFF_EXTERNAL_DEPENDS_targets "")
 set(SHEFF_EXTERNAL_DEPENDS_compile_defs "")
 
 macro(SPECIAL_TARGET_COMMANDS)
-  # Required for some non-standard functions in GNU
-  if (${CMAKE_C_COMPILER_ID} STREQUAL "GNU" )
+  # Required for some non-standard functions in GNU/MacOS
+  if (NOT WIN32)
     add_definitions(-D_XOPEN_SOURCE=700)
   endif()
 
